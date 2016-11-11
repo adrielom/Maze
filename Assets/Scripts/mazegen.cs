@@ -6,8 +6,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum dir { largura, altura};
 
 public class mazegen : MonoBehaviour {
+    public dir dir;
     public int width, height;
     public Material brick;
     private int[,] Maze;
@@ -17,6 +19,7 @@ public class mazegen : MonoBehaviour {
     private int _width, _height;
     private Vector2 _currentTile;
     public static String MazeString;
+    private int entrance1X, entrance1Z, entrance2X, entrance2Z;
     public Vector2 CurrentTile {
         get { return _currentTile; }
         private set {
@@ -30,9 +33,46 @@ public class mazegen : MonoBehaviour {
     public static mazegen Instance {
         get { return instance; }
     }
-    void Awake () { instance = this; MakeBlocks (); }
+    void Awake () {
+        instance = this;
+        RandomicPositions ();
+        MakeBlocks ();
+    }
     // end of main program
     // ============= subroutines 
+
+    
+
+    public void RandomicPositions () {
+
+        int a = rnd.Next (0, 2);
+
+        if (a == 0) {
+            dir = dir.altura;
+        }
+        else {
+            dir = dir.largura;
+        }
+
+        switch (dir) {
+            case dir.largura:
+                entrance1Z = 0;
+                entrance2Z = width - 1;
+                entrance1X = rnd.Next (1, height - 1);
+                entrance2X = rnd.Next (1, height - 1);
+            break;
+            case dir.altura:
+                entrance1Z = rnd.Next (1, width - 1);
+                entrance2Z = rnd.Next (1, width - 1);
+                entrance1X = 0;
+                entrance2X = height - 1;
+            break;
+        }
+
+        print ("Entrada 1 = " + entrance1Z + " " + entrance1X);
+        print ("Entrada 2  = " + entrance2Z + " " + entrance2X);
+
+    }
 
 
     void MakeBlocks () {
@@ -41,24 +81,27 @@ public class mazegen : MonoBehaviour {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Maze[x, y] = 1;
+
             }
         }
+
         CurrentTile = Vector2.one;
         _tiletoTry.Push (CurrentTile);
         Maze = CreateMaze ();  // generate the maze in Maze Array.
         GameObject ptype = null;
+        Maze[entrance1Z, entrance1X] = 0;
+        Maze[entrance2Z, entrance2X] = 0;
         for (int i = 0; i <= Maze.GetUpperBound (0); i++) {
             for (int j = 0; j <= Maze.GetUpperBound (1); j++) {
                 if (Maze[i, j] == 1) {
                     MazeString = MazeString + "X";  // added to create String
                     ptype = GameObject.CreatePrimitive (PrimitiveType.Cube);
                     ptype.transform.position = new Vector3 (i * ptype.transform.localScale.x, 0, j * ptype.transform.localScale.z);
-
                     if (brick != null) { ptype.GetComponent<Renderer> ().material = brick; }
                     ptype.transform.parent = transform;
                 }
                 else if (Maze[i, j] == 0) {
-                    MazeString = MazeString + "."; // added to create String
+                    MazeString = MazeString + "O"; // added to create String
                 }
             }
             MazeString = MazeString + "\n";  // added to create String
@@ -144,5 +187,4 @@ public class mazegen : MonoBehaviour {
         return p.x >= 0 && p.y >= 0 && p.x < width && p.y < height;
     }
 
-
- }
+}

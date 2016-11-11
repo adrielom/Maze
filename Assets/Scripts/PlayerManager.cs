@@ -16,12 +16,13 @@ public class PlayerManager : MonoBehaviour {
     }
 
     void Awake () {
-        InicialRandomPosition (width, height);
+        RandomPosition (width, height);
     }
 
-    public void InicialRandomPosition (int x, int y) {
+    public void RandomPosition (int x, int y) {
 
         transform.position = new Vector3 (Random.Range(0, x-1), transform.position.y, Random.Range (0, y-1));
+        
     }
 
 }
