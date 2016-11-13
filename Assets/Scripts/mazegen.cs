@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 
 public class mazegen : MonoBehaviour {
+    public GameObject player;
     public int width, height;
     public Material brick;
     private int[,] Maze;
@@ -34,18 +35,53 @@ public class mazegen : MonoBehaviour {
     // end of main program
     // ============= subroutines 
 
+    public void Entrances () {
 
+        int entranceLenght = rnd.Next (0, width - 1);
+        int exitLenght = rnd.Next (0, height - 1);
+        int r = rnd.Next (0, 2);
+
+        if (r == 0) {
+            Maze[0, entranceLenght] = 0;
+            Maze[width - 1, exitLenght] = 0;
+            player.transform.position = new Vector3 (0, 0, entranceLenght);
+            Maze[1, entranceLenght] = 0;
+            Maze[width - 2, exitLenght] = 0;
+            /* Randomic position of the player within the grid
+                Maze[entranceLenght, exitLenght] = 0;
+                player.transform.position = new Vector3 (entranceLenght, 0, exitLenght);
+            */
+        }
+        else if (r == 1) {
+            Maze[entranceLenght, 0] = 0;
+            Maze[exitLenght, height - 1] = 0;
+            player.transform.position = new Vector3 (entranceLenght, 0, 0);
+            Maze[entranceLenght, 1] = 0;
+            Maze[exitLenght, height - 2] = 0;
+            /* Randomic position of the player within the grid
+                Maze[entranceLenght, exitLenght] = 0;
+                player.transform.position = new Vector3 (entranceLenght, 0, exitLenght);
+            */
+        }
+        print (r);
+    }
+  
     void MakeBlocks () {
-        
+
+  
+
         Maze = new int[width, height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Maze[x, y] = 1;
             }
         }
+
         CurrentTile = Vector2.one;
         _tiletoTry.Push (CurrentTile);
         Maze = CreateMaze ();  // generate the maze in Maze Array.
+        Entrances ();
+
         GameObject ptype = null;
         for (int i = 0; i <= Maze.GetUpperBound (0); i++) {
             for (int j = 0; j <= Maze.GetUpperBound (1); j++) {
@@ -58,7 +94,8 @@ public class mazegen : MonoBehaviour {
                     ptype.transform.parent = transform;
                 }
                 else if (Maze[i, j] == 0) {
-                    MazeString = MazeString + "."; // added to create String
+                    MazeString = MazeString + "0"; // added to create String
+
                 }
             }
             MazeString = MazeString + "\n";  // added to create String
